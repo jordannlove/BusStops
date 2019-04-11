@@ -1,91 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<!-- "Read through the rest of the vue guide page down to Vue Components (which is outside the scope of this lab). "-->
-
-
  <head>
    <meta charset="UTF-8" />
    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
    <title>Vue Lab</title>
    <link
-     rel="stylesheet"    href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+     rel="stylesheet"
+     href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
      crossorigin="anonymous"
    />
  </head>
  <body>
+<br>
 
-   <!-- Jumbotron-->
-   <div class="jumbotron">
-     <h1 class="display-4">Hello, world!</h1>
-     <p class="lead">This is a simple hero unit, a simple jumbotron-style component for calling extra attention to featured content or information.</p>
-     <hr class="my-4">
-     <p>It uses utility classes for typography and spacing to space content out within the larger container.</p>
-     <a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a>
-   </div>
 
-   <!-- input for number of stops-->
-   <br><input v-model.number="numStops" type="number"><br><br>
+<!-- Jumbotron bootstrap element-->
+<div class="container">
+<h1 class="display-4">find your nearest bus stop>>>>></h1>
+<p class="lead"> >>>>>on the go</p>
+<hr class="my-4">
+  <div id="app">
+  <!-- input for number of stops-->
+  <br><input v-model.number="numStops" type="number"><br><br>
+    <div v-for="stop in filteredStops" :key="stop.id" class="card" style="width: 18rem;">
+      <div class="card-body">
+      <h5 class="card-title"> {{stop.name}} </h5>
+      <p class="card-text"> {{stop.description}} </p>
+      <p class="card-text"> {{stop.distance.toFixed(5)}} kilometers away</p>
+      </div>
+    </div>
+  </div>
+</div>
 
-   <div id="app">
-     <div v-for="stop in filteredStops" :key="stop.id" class="card" style="width: 18rem;">
-       <div class="card-body">
-         <h5 class="card-title"> {{stop.name}} </h5>
-         <p class="card-text"> {{stop.description}} </p>
-         <a href="#" class="btn btn-primary">Go somewhere</a>
-       </div>
-     </div>
-     </div>
-   </div>
 
-   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-   <script
-     src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-     integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-     crossorigin="anonymous"
-   ></script>
-   <script
-     src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-     integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-     crossorigin="anonymous"
-   ></script>
+<script
+  src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+  integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+  crossorigin="anonymous"
+></script>
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+  integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+  crossorigin="anonymous"
+ ></script>
+ <script
+  src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+  integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+  crossorigin="anonymous"
+ ></script>
 
-   <!-- development version, includes helpful console warnings -->
-   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
 
-   <script>
-   const app = new Vue
-  ({
-     el: '#app',
-     data:
-     {
-       stops: [],
-       numStops: 10
-     },
-     computed:
-     {
-       filteredStops: function()
-       {
-         return this.stops.slice(0, this.numStops)
-       }
-     },
-     mounted: function()
-     {
-       fetch('https://utils.pauliankline.com/stops.json')
-         .then(function(response)
-         {
-           return response.json();
-         })
-         .then(function(myJson)
-         {
-             app.stops = myJson;
-         });
-     }
-   })
-
+//initialize Vue app
+const app = new Vue
+({
+  el: '#app',
+  data:
+  {
+    stops: [],
+    numStops: 10,
+    latitude: 0,
+    longitude: 0
+  },
+  computed:
+  {
+    filteredStops: function()
+    {
+      this.stops.forEach(stop =>
+      {
+        stop.distance = this.distance(stop.lat, stop.lon)
+      })
+      this.stops.sort((stopA, stopB) =>
+      {
+        return(stopA.distance - stopB.distance)
+      })
+      return this.stops.slice(0, this.numStops)
+    }
+  },
+  methods:
+  {
+    // sources: https://stackoverflow.com/questions/365826/calculate-distance-between-2-gps-coordinates ,
+    // https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
+    // must convert degrees to radians!
+    distance: function(lat, lon)
+    {
+      let radius = 6371
+      let latitudeDist = (this.latitude - lat) * (Math.PI/180)
+      let longitudeDist = (this.longitude - lon) * (Math.PI/180)
+      let a = Math.sin(latitudeDist/2) * Math.sin(latitudeDist/2) + Math.cos((lat) * (Math.PI/180)) * Math.cos((this.latitude) * (Math.PI/180)) * Math.sin(longitudeDist/2) * Math.sin(longitudeDist/2)
+      let b = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+      let c = radius * b
+      return c
+    },
+    monitor: function()
+    {
+      navigator.geolocation.watchPosition(function (position)
+      {
+        app.latitude = position.coords.latitude
+        app.longitude = position.coords.longitude
+      })
+    }
+  },
+  beforeMount()
+  {
+    this.monitor()
+  },
+  //refers to bus stop info page through json
+  mounted: function()
+  {
+    fetch('https://utils.pauliankline.com/stops.json')
+      .then(function(response)
+      {
+        return response.json();
+      })
+      .then(function(myJson)
+      {
+          app.stops = myJson;
+      });
+  }
+})
    </script>
-
  </body>
 </html>
