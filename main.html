@@ -56,27 +56,35 @@ integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw
    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
    <script>
-   const app = new Vue({
+   const app = new Vue
+  ({
      el: '#app',
-     data: {
+     data:
+     {
        stops: [],
        numStops: 10
-     }
-     computed: {
-         // a computed getter
-         filteredStops: function () {
-           // `this` points to the vm instance
-           return this.stops.slice(0, this.numStops)
-         }
+     },
+     computed:
+     {
+       filteredStops: function()
+       {
+         return this.stops.slice(0, this.numStops)
        }
-     mounted: fetch('https://utils.pauliankline.com/stops.json')
-       .then(function(response) {
-         return response.json();
-       })
-       .then(function(myJson) {
-         console.log(JSON.stringify(myJson));
-       });
+     },
+     mounted: function()
+     {
+       fetch('https://utils.pauliankline.com/stops.json')
+         .then(function(response)
+         {
+           return response.json();
+         })
+         .then(function(myJson)
+         {
+             app.stops = myJson;
+         });
+     }
    })
+
    </script>
 
  </body>
